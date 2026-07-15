@@ -1,50 +1,40 @@
-name: Build SurveyCalc IPA
+name: SurveyCalc
+options:
+  bundleIdPrefix: com.selfuse.surveycalc
+  deploymentTarget:
+    iOS: "17.0"
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [ main ]
+targets:
+  SurveyCalc:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - SurveyCalcApp
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        NSLocationWhenInUseUsageDescription: "現在地から座標を取得するために使用します"
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.selfuse.surveycalc
+        PRODUCT_NAME: SurveyCalc
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
+        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
 
-jobs:
-  build:
-    runs-on: macos-14
-
-    steps:
-      - name: リポジトリを取得
-        uses: actions/checkout@v4
-
-      - name: 最新のXcodeを選択
-        run: |
-          LATEST=$(ls -d /Applications/Xcode_*.app | sort -V | tail -n 1)
-          echo "Using $LATEST"
-          sudo xcode-select -s "$LATEST/Contents/Developer"
-          xcodebuild -version
-
-      - name: XcodeGenをインストール
-        run: brew install xcodegen
-
-      - name: Xcodeプロジェクトを生成
-        run: xcodegen generate
-
-      - name: 未署名でビルド(署名はSideloadly側で行う)
-        run: |
-          xcodebuild build \
-            -scheme SurveyCalc \
-            -sdk iphoneos \
-            -configuration Release \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            -derivedDataPath build
-
-      - name: .ipaファイルにパッケージ化
-        run: |
-          cd build/Build/Products/Release-iphoneos
-          mkdir Payload
-          cp -r SurveyCalc.app Payload/
-          zip -r SurveyCalc.ipa Payload
-
-      - name: 成果物(.ipa)をアップロード
-        uses: actions/upload-artifact@v4
-        with:
-          name: SurveyCalc-ipa
-          path: build/Build/Products/Release-iphoneos/SurveyCalc.ipa
+schemes:
+  SurveyCalc:
+    build:
+      targets:
+        SurveyCalc: all
+    archive:
+      config: Release
