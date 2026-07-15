@@ -1,0 +1,43 @@
+name: Build SurveyCalc IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: リポジトリを取得
+        uses: actions/checkout@v4
+
+      - name: XcodeGenをインストール
+        run: brew install xcodegen
+
+      - name: Xcodeプロジェクトを生成
+        run: xcodegen generate
+
+      - name: 未署名でビルド(署名はSideloadly側で行う)
+        run: |
+          xcodebuild build \
+            -scheme SurveyCalc \
+            -sdk iphoneos \
+            -configuration Release \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            -derivedDataPath build
+
+      - name: .ipaファイルにパッケージ化
+        run: |
+          cd build/Build/Products/Release-iphoneos
+          mkdir Payload
+          cp -r SurveyCalc.app Payload/
+          zip -r SurveyCalc.ipa Payload
+
+      - name: 成果物(.ipa)をアップロード
+        uses: actions/upload-artifact@v4
+        with:
+          name: SurveyCalc-ipa
+          path: build/Build/Products/Release-iphoneos/SurveyCalc.ipa
