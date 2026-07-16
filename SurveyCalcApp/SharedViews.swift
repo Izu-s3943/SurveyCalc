@@ -37,9 +37,12 @@ struct NumericTextField: View {
             .focused($isFocused)
             .onAppear { text = format(value) }
             .onChange(of: text) { _, newText in
-                // 入力中でも、解釈できる数値であれば即座に計算用の値を更新する。
-                // (表示上の文字列と、実際に計算に使われる値がズレるのを防ぐため)
-                if let parsed = parse(newText) {
+                if newText.isEmpty {
+                    // 全部消したら「未入力」として扱う(0を明示的に表示しない)
+                    value = 0
+                } else if let parsed = parse(newText) {
+                    // 入力中でも、解釈できる数値であれば即座に計算用の値を更新する。
+                    // (表示上の文字列と、実際に計算に使われる値がズレるのを防ぐため)
                     value = parsed
                 }
             }
@@ -97,6 +100,8 @@ struct NumericTextField: View {
     }
 
     private func format(_ v: Double) -> String {
+        // 0は「未入力」とみなして空欄表示にする(クリア後に0が残って紛らわしいのを防ぐ)
+        if v == 0 { return "" }
         if allowDMSInput {
             return Self.dmsDashString(v)
         }
