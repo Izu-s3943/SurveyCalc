@@ -56,6 +56,7 @@ struct DistanceBearingView: View {
                 }
             }
             .navigationTitle("距離・方位角")
+            .withKeyboardDoneButton()
         }
     }
 }
