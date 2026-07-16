@@ -44,7 +44,7 @@ struct DistanceBearingView: View {
 
                 Section("計算結果") {
                     LabeledContent("距離") {
-                        Text("\(result.distance.m3) m")
+                        Text("\(result.distance.m4) m")
                             .font(.title3.monospacedDigit())
                             .bold()
                     }
@@ -57,6 +57,10 @@ struct DistanceBearingView: View {
             }
             .navigationTitle("距離・方位角")
             .withKeyboardDoneButton()
+            .withClearButton {
+                nameA = "測点A"; xA = 0; yA = 0
+                nameB = "測点B"; xB = 0; yB = 0
+            }
         }
     }
 }
