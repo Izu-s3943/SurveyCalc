@@ -11,6 +11,12 @@ struct ContentView: View {
 
             AreaCalculationView()
                 .tabItem { Label("面積計算", systemImage: "square.dashed") }
+
+            IntersectionCalculationView()
+                .tabItem { Label("交点計算", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
+
+            RadialCalculationView()
+                .tabItem { Label("放射計算", systemImage: "dot.radiowaves.left.and.right") }
         }
     }
 }
