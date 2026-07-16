@@ -33,8 +33,18 @@ struct NumericTextField: View {
             .multilineTextAlignment(.trailing)
             .focused($isFocused)
             .onAppear { text = format(value) }
+            .onChange(of: text) { _, newText in
+                // 入力中でも、解釈できる数値であれば即座に計算用の値を更新する。
+                // (表示上の文字列と、実際に計算に使われる値がズレるのを防ぐため)
+                if let parsed = parse(newText) {
+                    value = parsed
+                }
+            }
             .onChange(of: isFocused) { _, focused in
-                if !focused { commit() }
+                if !focused {
+                    // フォーカスが外れたら、表示だけをきれいな形式に整える
+                    text = format(value)
+                }
             }
             .onChange(of: value) { _, newValue in
                 // GPS取得などアプリ側からの更新は、編集中でなければ表示に反映する
@@ -42,18 +52,14 @@ struct NumericTextField: View {
             }
     }
 
-    private func commit() {
-        let normalized = text
+    private func parse(_ raw: String) -> Double? {
+        let normalized = raw
             .replacingOccurrences(of: "。", with: ".")
             .replacingOccurrences(of: "、", with: ".")
             .replacingOccurrences(of: "ー", with: "-")
             .replacingOccurrences(of: "−", with: "-")
             .trimmingCharacters(in: .whitespaces)
-        if let parsed = Double(normalized) {
-            value = parsed
-        }
-        // 確定後は必ずフォーマット済みの表示に揃える(未入力・不正入力時は元の値に戻す)
-        text = format(value)
+        return Double(normalized)
     }
 
     private func format(_ v: Double) -> String {
