@@ -85,6 +85,13 @@ struct AreaCalculationView: View {
             .navigationTitle("面積計算")
             .toolbar { EditButton() }
             .withKeyboardDoneButton()
+            .withClearButton {
+                points = [
+                    SurveyPoint(name: "点1"),
+                    SurveyPoint(name: "点2"),
+                    SurveyPoint(name: "点3")
+                ]
+            }
             .onChange(of: locationManager.currentFix) { _, newFix in
                 guard let fix = newFix, let idx = activeIndex, points.indices.contains(idx) else { return }
                 let zone = ZoneOrigin.zone(for: zoneNumber)
