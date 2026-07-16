@@ -139,8 +139,10 @@ struct PointEntryCard: View {
 }
 
 extension Double {
-    /// 表示用に丸めた文字列(小数点以下3桁)
+    /// 表示用に丸めた文字列(小数点以下3桁、座標・面積など)
     var m3: String { String(format: "%.3f", self) }
+    /// 距離表示用(小数点以下4桁。現場で切り捨て/四捨五入を使い分けられるように4桁目まで見せる)
+    var m4: String { String(format: "%.4f", self) }
 }
 
 extension View {
@@ -155,5 +157,35 @@ extension View {
                 }
             }
         }
+    }
+
+    /// 画面右上に「クリア」ボタンを表示し、タップすると確認のうえ入力内容をリセットする。
+    /// 前回の計算結果を見たまま、次の測点を入力してしまう入力ミスを防ぐため。
+    func withClearButton(onClear: @escaping () -> Void) -> some View {
+        modifier(ClearButtonModifier(onClear: onClear))
+    }
+}
+
+private struct ClearButtonModifier: ViewModifier {
+    let onClear: () -> Void
+    @State private var showConfirm = false
+
+    func body(content: Content) -> some View {
+        content
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(role: .destructive) {
+                        showConfirm = true
+                    } label: {
+                        Label("クリア", systemImage: "trash")
+                    }
+                }
+            }
+            .alert("入力内容をクリアしますか?", isPresented: $showConfirm) {
+                Button("クリア", role: .destructive, action: onClear)
+                Button("キャンセル", role: .cancel) {}
+            } message: {
+                Text("この画面のすべての入力値が初期状態に戻ります。")
+            }
     }
 }
