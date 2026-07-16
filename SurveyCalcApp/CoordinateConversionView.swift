@@ -41,13 +41,11 @@ struct CoordinateConversionView: View {
                     Section("入力: 緯度経度(10進法)") {
                         HStack {
                             Text("緯度").frame(width: 40, alignment: .leading)
-                            TextField("35.000000", value: $latitude, format: .number.precision(.fractionLength(0...8)))
-                                .keyboardType(.numbersAndPunctuation)
+                            NumericTextField(value: $latitude, placeholder: "35.000000", decimals: 8)
                         }
                         HStack {
                             Text("経度").frame(width: 40, alignment: .leading)
-                            TextField("139.000000", value: $longitude, format: .number.precision(.fractionLength(0...8)))
-                                .keyboardType(.numbersAndPunctuation)
+                            NumericTextField(value: $longitude, placeholder: "139.000000", decimals: 8)
                         }
                         Button {
                             locationManager.requestLocation()
