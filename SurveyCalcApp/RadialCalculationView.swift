@@ -89,6 +89,12 @@ struct RadialCalculationView: View {
                          : "探したい点の座標を入力すると、現場で器械にセットする角度と距離がわかります。バック点を見て0°をセットしてから使ってください。")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+
+                    if calcMode == .forward {
+                        Text("水平角は「38-42-38」のように度-分-秒をハイフンで区切って入力できます(10進度での入力も可)。")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 Section("器械点(トータルステーションの設置点)") {
@@ -134,12 +140,23 @@ struct RadialCalculationView: View {
         Section("視準点(放射、複数追加できます)") {
             ForEach($sightPoints) { $sight in
                 VStack(alignment: .leading, spacing: 8) {
-                    TextField("点名", text: $sight.name)
-                        .font(.subheadline.bold())
+                    HStack {
+                        TextField("点名", text: $sight.name)
+                            .font(.subheadline.bold())
+                        Spacer()
+                        Button {
+                            sight.angle = 0
+                            sight.distance = 0
+                        } label: {
+                            Image(systemName: "eraser")
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.secondary)
+                    }
 
                     HStack {
                         Text("水平角").frame(width: 56, alignment: .leading).foregroundStyle(.secondary)
-                        NumericTextField(value: $sight.angle, placeholder: "後視からの角度", decimals: 4)
+                        NumericTextField(value: $sight.angle, placeholder: "38-42-38", allowDMSInput: true)
                         Text("°")
                     }
                     CoordinateField(label: "距離", value: $sight.distance)
@@ -173,6 +190,14 @@ struct RadialCalculationView: View {
                         TextField("点名", text: $point.name)
                             .font(.subheadline.bold())
                         Spacer()
+                        Button {
+                            point.x = 0
+                            point.y = 0
+                        } label: {
+                            Image(systemName: "eraser")
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.secondary)
                         Button {
                             activeRestoreIndex = restorePoints.firstIndex(where: { $0.id == point.id })
                             restoreLocationManager.requestLocation()
