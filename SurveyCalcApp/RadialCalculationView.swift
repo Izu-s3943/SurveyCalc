@@ -133,8 +133,7 @@ struct RadialCalculationView: View {
 
                     HStack {
                         Text("水平角").frame(width: 56, alignment: .leading).foregroundStyle(.secondary)
-                        TextField("後視からの角度", value: $sight.angle, format: .number.precision(.fractionLength(0...4)))
-                            .textFieldStyle(.roundedBorder)
+                        NumericTextField(value: $sight.angle, placeholder: "後視からの角度", decimals: 4)
                         Text("°")
                     }
                     CoordinateField(label: "距離", value: $sight.distance)
