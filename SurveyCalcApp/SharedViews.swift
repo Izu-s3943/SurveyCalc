@@ -23,6 +23,9 @@ struct NumericTextField: View {
     @Binding var value: Double
     var placeholder: String = "0.000"
     var decimals: Int = 4
+    /// true にすると「38-42-38.5」のような 度-分-秒 のハイフン区切り入力を受け付け、
+    /// 表示もその形式で行う(角度専用)。
+    var allowDMSInput: Bool = false
 
     @State private var text: String = ""
     @FocusState private var isFocused: Bool
@@ -53,20 +56,65 @@ struct NumericTextField: View {
     }
 
     private func parse(_ raw: String) -> Double? {
-        let normalized = raw
+        var normalized = raw
             .replacingOccurrences(of: "。", with: ".")
             .replacingOccurrences(of: "、", with: ".")
             .replacingOccurrences(of: "ー", with: "-")
             .replacingOccurrences(of: "−", with: "-")
             .trimmingCharacters(in: .whitespaces)
-        return Double(normalized)
+
+        guard !normalized.isEmpty else { return nil }
+
+        guard allowDMSInput else {
+            return Double(normalized)
+        }
+
+        // 度-分-秒 形式(例: 38-42-38.5、または 38-42)を10進度に変換する。
+        // 先頭の "-" は負号として扱い、区切りの "-" とは区別する。
+        var isNegative = false
+        if normalized.hasPrefix("-") {
+            isNegative = true
+            normalized.removeFirst()
+        }
+
+        if normalized.contains("-") {
+            let parts = normalized.split(separator: "-", omittingEmptySubsequences: false).map(String.init)
+            if parts.count == 3,
+               let d = Double(parts[0]), let m = Double(parts[1]), let s = Double(parts[2]) {
+                let decimal = GeoMath.dmsToDecimal(degrees: d, minutes: m, seconds: s)
+                return isNegative ? -decimal : decimal
+            }
+            if parts.count == 2,
+               let d = Double(parts[0]), let m = Double(parts[1]) {
+                let decimal = GeoMath.dmsToDecimal(degrees: d, minutes: m, seconds: 0)
+                return isNegative ? -decimal : decimal
+            }
+            return nil // 途中入力(例: "38-")はまだ確定させない
+        }
+
+        let plain = Double(normalized)
+        return plain.map { isNegative ? -$0 : $0 }
     }
 
     private func format(_ v: Double) -> String {
+        if allowDMSInput {
+            return Self.dmsDashString(v)
+        }
         var s = String(format: "%.\(decimals)f", v)
         while s.contains(".") && s.hasSuffix("0") { s.removeLast() }
         if s.hasSuffix(".") { s.removeLast() }
         return s
+    }
+
+    /// 10進度 → "38-42-38.50" のようなハイフン区切り文字列に変換
+    private static func dmsDashString(_ decimal: Double) -> String {
+        let sign = decimal < 0 ? "-" : ""
+        let absVal = abs(decimal)
+        let deg = Int(absVal)
+        let minFull = (absVal - Double(deg)) * 60
+        let minutes = Int(minFull)
+        let seconds = (minFull - Double(minutes)) * 60
+        return String(format: "%@%d-%d-%05.2f", sign, deg, minutes, seconds)
     }
 }
 
@@ -104,6 +152,15 @@ struct PointEntryCard: View {
                 TextField(title, text: $name)
                     .font(.headline)
                 Spacer()
+                Button {
+                    x = 0
+                    y = 0
+                } label: {
+                    Image(systemName: "xmark.circle")
+                }
+                .buttonStyle(.bordered)
+                .tint(.secondary)
+
                 Button {
                     locationManager.requestLocation()
                 } label: {
