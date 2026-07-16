@@ -93,8 +93,7 @@ struct IntersectionCalculationView: View {
                 .padding(.vertical, 4)
             HStack {
                 Text("方位角").frame(width: 56, alignment: .leading).foregroundStyle(.secondary)
-                TextField("度", value: $bearing1, format: .number.precision(.fractionLength(0...3)))
-                    .textFieldStyle(.roundedBorder)
+                NumericTextField(value: $bearing1, placeholder: "度", decimals: 4)
                 Text("°")
             }
         }
@@ -105,8 +104,7 @@ struct IntersectionCalculationView: View {
                 .padding(.vertical, 4)
             HStack {
                 Text("方位角").frame(width: 56, alignment: .leading).foregroundStyle(.secondary)
-                TextField("度", value: $bearing2, format: .number.precision(.fractionLength(0...3)))
-                    .textFieldStyle(.roundedBorder)
+                NumericTextField(value: $bearing2, placeholder: "度", decimals: 4)
                 Text("°")
             }
         }
