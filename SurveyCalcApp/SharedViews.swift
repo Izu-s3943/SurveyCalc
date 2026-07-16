@@ -15,6 +15,55 @@ struct ZonePickerView: View {
     }
 }
 
+/// 数値入力用の頑丈なテキストフィールド。
+/// SwiftUIの `TextField(value:format:)` は、小数点以下を消して整数のまま
+/// 確定しようとした際などに、内部の値が正しく更新されないことがある。
+/// そのため文字列を経由して明示的にパースし、フォーカスが外れた時点で確定させる。
+struct NumericTextField: View {
+    @Binding var value: Double
+    var placeholder: String = "0.000"
+    var decimals: Int = 4
+
+    @State private var text: String = ""
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        TextField(placeholder, text: $text)
+            .keyboardType(.numbersAndPunctuation)
+            .multilineTextAlignment(.trailing)
+            .focused($isFocused)
+            .onAppear { text = format(value) }
+            .onChange(of: isFocused) { _, focused in
+                if !focused { commit() }
+            }
+            .onChange(of: value) { _, newValue in
+                // GPS取得などアプリ側からの更新は、編集中でなければ表示に反映する
+                if !isFocused { text = format(newValue) }
+            }
+    }
+
+    private func commit() {
+        let normalized = text
+            .replacingOccurrences(of: "。", with: ".")
+            .replacingOccurrences(of: "、", with: ".")
+            .replacingOccurrences(of: "ー", with: "-")
+            .replacingOccurrences(of: "−", with: "-")
+            .trimmingCharacters(in: .whitespaces)
+        if let parsed = Double(normalized) {
+            value = parsed
+        }
+        // 確定後は必ずフォーマット済みの表示に揃える(未入力・不正入力時は元の値に戻す)
+        text = format(value)
+    }
+
+    private func format(_ v: Double) -> String {
+        var s = String(format: "%.\(decimals)f", v)
+        while s.contains(".") && s.hasSuffix("0") { s.removeLast() }
+        if s.hasSuffix(".") { s.removeLast() }
+        return s
+    }
+}
+
 /// 数値入力用のラベル付きテキストフィールド(m単位)
 struct CoordinateField: View {
     let label: String
@@ -25,8 +74,7 @@ struct CoordinateField: View {
             Text(label)
                 .frame(width: 28, alignment: .leading)
                 .foregroundStyle(.secondary)
-            TextField("0.000", value: $value, format: .number.precision(.fractionLength(0...4)))
-                .keyboardType(.numbersAndPunctuation)
+            NumericTextField(value: $value)
                 .textFieldStyle(.roundedBorder)
             Text("m")
                 .foregroundStyle(.secondary)
