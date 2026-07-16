@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import CoreLocation
 
 /// 平面直角座標系(1〜19系)の選択ピッカー
@@ -86,4 +87,19 @@ struct PointEntryCard: View {
 extension Double {
     /// 表示用に丸めた文字列(小数点以下3桁)
     var m3: String { String(format: "%.3f", self) }
+}
+
+extension View {
+    /// キーボード表示中、キーボードのすぐ上に「閉じる」ボタンを表示する。
+    /// タブバーがキーボードに隠れて他の画面へ切り替えられなくなる問題への対策。
+    func withKeyboardDoneButton() -> some View {
+        toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("閉じる") {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+            }
+        }
+    }
 }
