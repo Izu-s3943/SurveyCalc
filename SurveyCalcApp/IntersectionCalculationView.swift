@@ -70,6 +70,14 @@ struct IntersectionCalculationView: View {
             }
             .navigationTitle("交点計算")
             .withKeyboardDoneButton()
+            .withClearButton {
+                name1 = "既知点1"; x1 = 0; y1 = 0
+                name2 = "既知点2"; x2 = 100; y2 = 0
+                bearing1 = 45; bearing2 = 315
+                dist1 = 100; dist2 = 100
+                ax1 = 0; ay1 = 0; ax2 = 100; ay2 = 100
+                bx1 = 0; by1 = 100; bx2 = 100; by2 = 0
+            }
         }
     }
 
