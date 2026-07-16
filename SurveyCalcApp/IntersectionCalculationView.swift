@@ -69,6 +69,7 @@ struct IntersectionCalculationView: View {
                 }
             }
             .navigationTitle("交点計算")
+            .withKeyboardDoneButton()
         }
     }
 
