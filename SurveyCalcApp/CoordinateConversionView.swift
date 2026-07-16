@@ -96,6 +96,7 @@ struct CoordinateConversionView: View {
                 }
             }
             .navigationTitle("座標変換")
+            .withKeyboardDoneButton()
             .onChange(of: locationManager.currentFix) { _, newFix in
                 guard let fix = newFix else { return }
                 latitude = fix.latitude
