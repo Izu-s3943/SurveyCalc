@@ -84,6 +84,7 @@ struct AreaCalculationView: View {
             }
             .navigationTitle("面積計算")
             .toolbar { EditButton() }
+            .withKeyboardDoneButton()
             .onChange(of: locationManager.currentFix) { _, newFix in
                 guard let fix = newFix, let idx = activeIndex, points.indices.contains(idx) else { return }
                 let zone = ZoneOrigin.zone(for: zoneNumber)
