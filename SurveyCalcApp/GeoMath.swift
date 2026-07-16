@@ -125,6 +125,75 @@ enum GeoMath {
         return abs(sum) / 2.0
     }
 
+    // MARK: - 放射法(器械点・バック点から視準点の座標を求める)
+    /// 器械点から、指定した方位角(バック点方向を基準とした角度を加算済みのもの)・距離にある点の座標を求める。
+    /// いわゆる「順計算」(トラバースの直接計算)。
+    static func radiationPoint(station: PlaneCoordinate2D, azimuth: Double, distance: Double) -> PlaneCoordinate2D {
+        let rad = degToRad(azimuth)
+        return PlaneCoordinate2D(x: station.x + distance * cos(rad), y: station.y + distance * sin(rad))
+    }
+
+    // MARK: - 交点計算1: 前方交会(2点からの方向角による交点)
+    /// p1から方位角bearing1、p2から方位角bearing2の方向に伸ばした直線の交点を求める。
+    /// 2直線が平行(交点なし)の場合は nil を返す。
+    static func bearingIntersection(p1: PlaneCoordinate2D, bearing1: Double,
+                                     p2: PlaneCoordinate2D, bearing2: Double) -> PlaneCoordinate2D? {
+        let t1r = degToRad(bearing1), t2r = degToRad(bearing2)
+        let d1x = cos(t1r), d1y = sin(t1r)
+        let d2x = cos(t2r), d2y = sin(t2r)
+        let det = d1x * (-d2y) - (-d2x) * d1y
+        if abs(det) < 1e-12 { return nil }
+        let bx = p2.x - p1.x
+        let by = p2.y - p1.y
+        let t1 = (bx * (-d2y) - (-d2x) * by) / det
+        return PlaneCoordinate2D(x: p1.x + t1 * d1x, y: p1.y + t1 * d1y)
+    }
+
+    // MARK: - 交点計算2: 距離交会(2点からの距離による交点、円と円の交点)
+    /// p1から距離d1、p2から距離d2の位置にある交点(通常2つ)を求める。
+    /// 解が存在しない(2円が交わらない)場合は nil。
+    static func distanceIntersection(p1: PlaneCoordinate2D, d1: Double,
+                                      p2: PlaneCoordinate2D, d2: Double) -> (PlaneCoordinate2D, PlaneCoordinate2D)? {
+        let dx = p2.x - p1.x
+        let dy = p2.y - p1.y
+        let D = sqrt(dx * dx + dy * dy)
+        guard D > 1e-9, D <= d1 + d2, D >= abs(d1 - d2) else { return nil }
+
+        let a = (d1 * d1 - d2 * d2 + D * D) / (2 * D)
+        let hSquared = d1 * d1 - a * a
+        guard hSquared >= 0 else { return nil }
+        let h = sqrt(hSquared)
+
+        let xm = p1.x + a * dx / D
+        let ym = p1.y + a * dy / D
+        let rx = -dy * (h / D)
+        let ry = dx * (h / D)
+
+        return (PlaneCoordinate2D(x: xm + rx, y: ym + ry),
+                PlaneCoordinate2D(x: xm - rx, y: ym - ry))
+    }
+
+    // MARK: - 交点計算3: 2直線の交点(各直線を2点で指定)
+    static func lineIntersection(a1: PlaneCoordinate2D, a2: PlaneCoordinate2D,
+                                  b1: PlaneCoordinate2D, b2: PlaneCoordinate2D) -> PlaneCoordinate2D? {
+        let d1x = a2.x - a1.x, d1y = a2.y - a1.y
+        let d2x = b2.x - b1.x, d2y = b2.y - b1.y
+        let det = d1x * (-d2y) - (-d2x) * d1y
+        if abs(det) < 1e-12 { return nil }
+        let bx = b1.x - a1.x
+        let by = b1.y - a1.y
+        let t1 = (bx * (-d2y) - (-d2x) * by) / det
+        return PlaneCoordinate2D(x: a1.x + t1 * d1x, y: a1.y + t1 * d1y)
+    }
+
+    // MARK: - 放射法: 起点+方位角+距離 から求点の座標を求める(トラバースの正算)
+    /// distanceAndBearing() が「2点の座標から距離・方位角を求める」逆算にあたるのに対し、
+    /// こちらは「起点・方位角・距離から新点の座標を求める」正算(順トラバース)にあたる。
+    static func polarPoint(from origin: PlaneCoordinate2D, bearing: Double, distance: Double) -> PlaneCoordinate2D {
+        let rad = degToRad(bearing)
+        return PlaneCoordinate2D(x: origin.x + distance * cos(rad), y: origin.y + distance * sin(rad))
+    }
+
     // MARK: - 度分秒 <-> 10進度
     static func dmsToDecimal(degrees: Double, minutes: Double, seconds: Double) -> Double {
         let sign: Double = degrees < 0 ? -1 : 1
