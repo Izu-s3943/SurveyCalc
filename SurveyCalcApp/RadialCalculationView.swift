@@ -91,7 +91,7 @@ struct RadialCalculationView: View {
                         .foregroundStyle(.secondary)
 
                     if calcMode == .forward {
-                        Text("水平角は「38-42-38」のように度-分-秒をハイフンで区切って入力できます(10進度での入力も可)。")
+                        Text("水平角は「0-0-00.00」(度-分-秒)の形式でハイフン区切り入力できます。10進度での入力も可。")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -156,7 +156,8 @@ struct RadialCalculationView: View {
 
                     HStack {
                         Text("水平角").frame(width: 56, alignment: .leading).foregroundStyle(.secondary)
-                        NumericTextField(value: $sight.angle, placeholder: "38-42-38", allowDMSInput: true)
+                        NumericTextField(value: $sight.angle, placeholder: "0-0-00.00", allowDMSInput: true)
+                            .textFieldStyle(.roundedBorder)
                         Text("°")
                     }
                     CoordinateField(label: "距離", value: $sight.distance)
