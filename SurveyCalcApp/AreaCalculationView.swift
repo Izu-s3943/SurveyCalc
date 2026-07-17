@@ -30,6 +30,14 @@ struct AreaCalculationView: View {
                                     .font(.subheadline.bold())
                                 Spacer()
                                 Button {
+                                    point.x = 0
+                                    point.y = 0
+                                } label: {
+                                    Image(systemName: "eraser")
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(.secondary)
+                                Button {
                                     activeIndex = points.firstIndex(where: { $0.id == point.id })
                                     locationManager.requestLocation()
                                 } label: {
