@@ -59,7 +59,7 @@ struct IntersectionCalculationView: View {
                         .foregroundStyle(.secondary)
 
                     if mode == .bearing {
-                        Text("方位角は「38-42-38」のように度-分-秒をハイフンで区切って入力できます(10進度での入力も可)。")
+                        Text("方位角は「0-0-00.00」(度-分-秒)の形式でハイフン区切り入力できます。10進度での入力も可。")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -107,7 +107,8 @@ struct IntersectionCalculationView: View {
                 .padding(.vertical, 4)
             HStack {
                 Text("方位角").frame(width: 56, alignment: .leading).foregroundStyle(.secondary)
-                NumericTextField(value: $bearing1, placeholder: "38-42-38", allowDMSInput: true)
+                NumericTextField(value: $bearing1, placeholder: "0-0-00.00", allowDMSInput: true)
+                    .textFieldStyle(.roundedBorder)
                 Text("°")
             }
         }
@@ -118,7 +119,8 @@ struct IntersectionCalculationView: View {
                 .padding(.vertical, 4)
             HStack {
                 Text("方位角").frame(width: 56, alignment: .leading).foregroundStyle(.secondary)
-                NumericTextField(value: $bearing2, placeholder: "38-42-38", allowDMSInput: true)
+                NumericTextField(value: $bearing2, placeholder: "0-0-00.00", allowDMSInput: true)
+                    .textFieldStyle(.roundedBorder)
                 Text("°")
             }
         }
