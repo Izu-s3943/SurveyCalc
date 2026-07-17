@@ -102,8 +102,7 @@ struct IntersectionCalculationView: View {
     @ViewBuilder
     private var bearingSections: some View {
         Section("既知点1") {
-            PointEntryCard(title: "点名", name: $name1, x: $x1, y: $y1, zoneNumber: zoneNumber, locationManager: loc1,
-                           onClear: { x1 = 0; y1 = 0; bearing1 = 0 })
+            PointEntryCard(title: "点名", name: $name1, x: $x1, y: $y1, zoneNumber: zoneNumber, locationManager: loc1)
                 .listRowInsets(EdgeInsets())
                 .padding(.vertical, 4)
             HStack {
@@ -111,12 +110,18 @@ struct IntersectionCalculationView: View {
                 NumericTextField(value: $bearing1, placeholder: "0-0-00.00", allowDMSInput: true)
                     .textFieldStyle(.roundedBorder)
                 Text("°")
+                Button {
+                    bearing1 = 0
+                } label: {
+                    Image(systemName: "eraser")
+                }
+                .buttonStyle(.bordered)
+                .tint(.secondary)
             }
         }
 
         Section("既知点2") {
-            PointEntryCard(title: "点名", name: $name2, x: $x2, y: $y2, zoneNumber: zoneNumber, locationManager: loc2,
-                           onClear: { x2 = 0; y2 = 0; bearing2 = 0 })
+            PointEntryCard(title: "点名", name: $name2, x: $x2, y: $y2, zoneNumber: zoneNumber, locationManager: loc2)
                 .listRowInsets(EdgeInsets())
                 .padding(.vertical, 4)
             HStack {
@@ -124,6 +129,13 @@ struct IntersectionCalculationView: View {
                 NumericTextField(value: $bearing2, placeholder: "0-0-00.00", allowDMSInput: true)
                     .textFieldStyle(.roundedBorder)
                 Text("°")
+                Button {
+                    bearing2 = 0
+                } label: {
+                    Image(systemName: "eraser")
+                }
+                .buttonStyle(.bordered)
+                .tint(.secondary)
             }
         }
 
@@ -135,7 +147,7 @@ struct IntersectionCalculationView: View {
                 LabeledContent("X") { Text("\(result.x.m3) m").bold() }
                 LabeledContent("Y") { Text("\(result.y.m3) m").bold() }
             } else {
-                Text("2つの方向が平行のため、交点を求められません。方位角を見直してください。")
+                Text("交差しないため計算できません。2つの方位角が平行、または指定した方位角の前方(視準方向)では交わらない位置関係です。方位角を見直してください。")
                     .foregroundStyle(.red)
             }
         }
@@ -145,19 +157,35 @@ struct IntersectionCalculationView: View {
     @ViewBuilder
     private var distanceSections: some View {
         Section("既知点1") {
-            PointEntryCard(title: "点名", name: $name1, x: $x1, y: $y1, zoneNumber: zoneNumber, locationManager: loc1,
-                           onClear: { x1 = 0; y1 = 0; dist1 = 0 })
+            PointEntryCard(title: "点名", name: $name1, x: $x1, y: $y1, zoneNumber: zoneNumber, locationManager: loc1)
                 .listRowInsets(EdgeInsets())
                 .padding(.vertical, 4)
-            CoordinateField(label: "距離", value: $dist1)
+            HStack {
+                CoordinateField(label: "距離", value: $dist1)
+                Button {
+                    dist1 = 0
+                } label: {
+                    Image(systemName: "eraser")
+                }
+                .buttonStyle(.bordered)
+                .tint(.secondary)
+            }
         }
 
         Section("既知点2") {
-            PointEntryCard(title: "点名", name: $name2, x: $x2, y: $y2, zoneNumber: zoneNumber, locationManager: loc2,
-                           onClear: { x2 = 0; y2 = 0; dist2 = 0 })
+            PointEntryCard(title: "点名", name: $name2, x: $x2, y: $y2, zoneNumber: zoneNumber, locationManager: loc2)
                 .listRowInsets(EdgeInsets())
                 .padding(.vertical, 4)
-            CoordinateField(label: "距離", value: $dist2)
+            HStack {
+                CoordinateField(label: "距離", value: $dist2)
+                Button {
+                    dist2 = 0
+                } label: {
+                    Image(systemName: "eraser")
+                }
+                .buttonStyle(.bordered)
+                .tint(.secondary)
+            }
         }
 
         Section("計算結果(2つ求まります)") {
