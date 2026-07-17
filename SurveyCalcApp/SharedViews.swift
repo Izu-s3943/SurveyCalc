@@ -141,6 +141,33 @@ struct CoordinateField: View {
     }
 }
 
+/// X,Yのペアをまとめて表示し、まとめてクリアもできる小さな入力ブロック。
+/// (点名を持たない、単純な座標ペア向け。例:2直線の交点の各端点)
+struct ClearableCoordinatePair: View {
+    let title: String
+    @Binding var x: Double
+    @Binding var y: Double
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(title).font(.subheadline.bold())
+                Spacer()
+                Button {
+                    x = 0
+                    y = 0
+                } label: {
+                    Image(systemName: "eraser")
+                }
+                .buttonStyle(.bordered)
+                .tint(.secondary)
+            }
+            CoordinateField(label: "X", value: $x)
+            CoordinateField(label: "Y", value: $y)
+        }
+    }
+}
+
 /// 1点分の入力カード。X,Y手入力、またはGPSで現在地を取得して
 /// 選択中の系で平面直角座標に変換した値を反映する。
 struct PointEntryCard: View {
@@ -150,6 +177,9 @@ struct PointEntryCard: View {
     @Binding var y: Double
     let zoneNumber: Int
     @ObservedObject var locationManager: LocationManager
+    /// 指定すると、消しゴムボタンでX・Y以外の関連する値(方位角・距離など)も
+    /// まとめてクリアできる。未指定の場合はX・Yだけをクリアする。
+    var onClear: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -158,8 +188,12 @@ struct PointEntryCard: View {
                     .font(.headline)
                 Spacer()
                 Button {
-                    x = 0
-                    y = 0
+                    if let onClear {
+                        onClear()
+                    } else {
+                        x = 0
+                        y = 0
+                    }
                 } label: {
                     Image(systemName: "xmark.circle")
                 }
