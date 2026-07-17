@@ -49,13 +49,23 @@ struct CoordinateConversionView: View {
                             NumericTextField(value: $longitude, placeholder: "139.000000", decimals: 8)
                                 .textFieldStyle(.roundedBorder)
                         }
-                        Button {
-                            locationManager.requestLocation()
-                        } label: {
-                            if locationManager.isAcquiring {
-                                ProgressView()
-                            } else {
-                                Label("現在地を入力", systemImage: "location.fill")
+                        HStack {
+                            Button {
+                                latitude = 0; longitude = 0
+                            } label: {
+                                Label("クリア", systemImage: "eraser")
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(.secondary)
+
+                            Button {
+                                locationManager.requestLocation()
+                            } label: {
+                                if locationManager.isAcquiring {
+                                    ProgressView()
+                                } else {
+                                    Label("現在地を入力", systemImage: "location.fill")
+                                }
                             }
                         }
                         if let error = locationManager.errorMessage {
@@ -76,6 +86,13 @@ struct CoordinateConversionView: View {
                     Section("入力: 平面直角座標(\(zone.name))") {
                         CoordinateField(label: "X", value: $x)
                         CoordinateField(label: "Y", value: $y)
+                        Button {
+                            x = 0; y = 0
+                        } label: {
+                            Label("クリア", systemImage: "eraser")
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.secondary)
                     }
 
                     Section("変換結果: 緯度経度") {
@@ -98,7 +115,7 @@ struct CoordinateConversionView: View {
             .navigationTitle("座標変換")
             .withKeyboardDoneButton()
             .withClearButton {
-                latitude = 35.0; longitude = 139.0
+                latitude = 0; longitude = 0
                 x = 0; y = 0
             }
             .onChange(of: locationManager.currentFix) { _, newFix in
