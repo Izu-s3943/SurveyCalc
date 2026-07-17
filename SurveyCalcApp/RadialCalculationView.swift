@@ -127,7 +127,7 @@ struct RadialCalculationView: View {
             .withKeyboardDoneButton()
             .withClearButton {
                 stationName = "器械点"; stationX = 0; stationY = 0
-                backsightName = "バック点"; backsightX = 100; backsightY = 0
+                backsightName = "バック点"; backsightX = 0; backsightY = 0
                 sightPoints = [SightPoint(name: "視準点1"), SightPoint(name: "視準点2")]
                 restorePoints = [SurveyPoint(name: "復元点1"), SurveyPoint(name: "復元点2")]
             }
