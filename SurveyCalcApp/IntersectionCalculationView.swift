@@ -102,7 +102,8 @@ struct IntersectionCalculationView: View {
     @ViewBuilder
     private var bearingSections: some View {
         Section("既知点1") {
-            PointEntryCard(title: "点名", name: $name1, x: $x1, y: $y1, zoneNumber: zoneNumber, locationManager: loc1)
+            PointEntryCard(title: "点名", name: $name1, x: $x1, y: $y1, zoneNumber: zoneNumber, locationManager: loc1,
+                           onClear: { x1 = 0; y1 = 0; bearing1 = 0 })
                 .listRowInsets(EdgeInsets())
                 .padding(.vertical, 4)
             HStack {
@@ -114,7 +115,8 @@ struct IntersectionCalculationView: View {
         }
 
         Section("既知点2") {
-            PointEntryCard(title: "点名", name: $name2, x: $x2, y: $y2, zoneNumber: zoneNumber, locationManager: loc2)
+            PointEntryCard(title: "点名", name: $name2, x: $x2, y: $y2, zoneNumber: zoneNumber, locationManager: loc2,
+                           onClear: { x2 = 0; y2 = 0; bearing2 = 0 })
                 .listRowInsets(EdgeInsets())
                 .padding(.vertical, 4)
             HStack {
@@ -143,14 +145,16 @@ struct IntersectionCalculationView: View {
     @ViewBuilder
     private var distanceSections: some View {
         Section("既知点1") {
-            PointEntryCard(title: "点名", name: $name1, x: $x1, y: $y1, zoneNumber: zoneNumber, locationManager: loc1)
+            PointEntryCard(title: "点名", name: $name1, x: $x1, y: $y1, zoneNumber: zoneNumber, locationManager: loc1,
+                           onClear: { x1 = 0; y1 = 0; dist1 = 0 })
                 .listRowInsets(EdgeInsets())
                 .padding(.vertical, 4)
             CoordinateField(label: "距離", value: $dist1)
         }
 
         Section("既知点2") {
-            PointEntryCard(title: "点名", name: $name2, x: $x2, y: $y2, zoneNumber: zoneNumber, locationManager: loc2)
+            PointEntryCard(title: "点名", name: $name2, x: $x2, y: $y2, zoneNumber: zoneNumber, locationManager: loc2,
+                           onClear: { x2 = 0; y2 = 0; dist2 = 0 })
                 .listRowInsets(EdgeInsets())
                 .padding(.vertical, 4)
             CoordinateField(label: "距離", value: $dist2)
@@ -185,17 +189,13 @@ struct IntersectionCalculationView: View {
     @ViewBuilder
     private var lineSections: some View {
         Section("直線1(2点で指定)") {
-            CoordinateField(label: "X1", value: $ax1)
-            CoordinateField(label: "Y1", value: $ay1)
-            CoordinateField(label: "X2", value: $ax2)
-            CoordinateField(label: "Y2", value: $ay2)
+            ClearableCoordinatePair(title: "点1", x: $ax1, y: $ay1)
+            ClearableCoordinatePair(title: "点2", x: $ax2, y: $ay2)
         }
 
         Section("直線2(2点で指定)") {
-            CoordinateField(label: "X1", value: $bx1)
-            CoordinateField(label: "Y1", value: $by1)
-            CoordinateField(label: "X2", value: $bx2)
-            CoordinateField(label: "Y2", value: $by2)
+            ClearableCoordinatePair(title: "点1", x: $bx1, y: $by1)
+            ClearableCoordinatePair(title: "点2", x: $bx2, y: $by2)
         }
 
         Section("計算結果") {
