@@ -42,10 +42,12 @@ struct CoordinateConversionView: View {
                         HStack {
                             Text("緯度").frame(width: 40, alignment: .leading)
                             NumericTextField(value: $latitude, placeholder: "35.000000", decimals: 8)
+                                .textFieldStyle(.roundedBorder)
                         }
                         HStack {
                             Text("経度").frame(width: 40, alignment: .leading)
                             NumericTextField(value: $longitude, placeholder: "139.000000", decimals: 8)
+                                .textFieldStyle(.roundedBorder)
                         }
                         Button {
                             locationManager.requestLocation()
