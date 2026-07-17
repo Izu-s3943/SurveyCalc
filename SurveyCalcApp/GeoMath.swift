@@ -134,8 +134,8 @@ enum GeoMath {
     }
 
     // MARK: - 交点計算1: 前方交会(2点からの方向角による交点)
-    /// p1から方位角bearing1、p2から方位角bearing2の方向に伸ばした直線の交点を求める。
-    /// 2直線が平行(交点なし)の場合は nil を返す。
+    /// p1から方位角bearing1、p2から方位角bearing2の「前方」に伸ばした視準方向(半直線)の交点を求める。
+    /// 2直線が平行、または指定した方位角の前方では交わらない(反対方向でしか交わらない)場合は nil を返す。
     static func bearingIntersection(p1: PlaneCoordinate2D, bearing1: Double,
                                      p2: PlaneCoordinate2D, bearing2: Double) -> PlaneCoordinate2D? {
         let t1r = degToRad(bearing1), t2r = degToRad(bearing2)
@@ -146,6 +146,11 @@ enum GeoMath {
         let bx = p2.x - p1.x
         let by = p2.y - p1.y
         let t1 = (bx * (-d2y) - (-d2x) * by) / det
+        let t2 = (d1x * by - bx * d1y) / det
+        // t1・t2 はそれぞれの点から交点までの「前方向への距離」に相当する。
+        // マイナスは指定した方位角と反対方向でしか交わらないことを意味し、前方交会としては不成立。
+        let tolerance = -1e-6
+        guard t1 >= tolerance, t2 >= tolerance else { return nil }
         return PlaneCoordinate2D(x: p1.x + t1 * d1x, y: p1.y + t1 * d1y)
     }
 
